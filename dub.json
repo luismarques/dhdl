@@ -1,0 +1,13 @@
+{
+    "name": "dhdl",
+    "authors": [
+        "Luís Marques"
+    ],
+    "description": "DHDL: The D Hardware Description Language",
+    "copyright": "Copyright © 2016-2018, Luís Marques",
+    "license": "BSL-1.0",
+    "versions": ["HWTests"],
+    "dependencies": {
+        "openmethods": "~>1.1.0"
+    }
+}
