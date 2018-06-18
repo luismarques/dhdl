@@ -1321,8 +1321,7 @@ class Circuit : Composite
     void when(Value condition, void delegate() blockTrue,
         void delegate() blockFalse = null)
     {
-        auto when = new When(condition);
-        when.circuit = this;
+        auto when = new When(this, condition);
 
         blockStack ~= &when.blockTrue;
         blockTrue();
@@ -1336,6 +1335,30 @@ class Circuit : Composite
         }
 
         currentBlock ~= when;
+    }
+
+    void match(Args...)(Value value, Args args)
+    {
+        static assert(args.length % 2 == 0);
+        auto when = new When(this);
+        matchImpl(when, value, args);
+    }
+
+    private void matchImpl(Args...)(When when, Value value, Args args)
+    {
+        when.condition = value.eq(args[0]);
+        blockStack ~= &when.blockTrue;
+        args[1]();
+        blockStack.popBack();
+        currentBlock ~= when;
+    
+        static if(args.length > 2)
+        {
+            blockStack ~= &when.blockFalse;
+            auto elseWhen = new When(this);
+            matchImpl(elseWhen, value, args[2 .. $]);
+            blockStack.popBack();
+        }
     }
 
     auto ref currentBlock()
@@ -1763,8 +1786,14 @@ class Connection : Node
 
 class When : Node
 {
-    this(Value condition)
+    this(Circuit circuit)
     {
+        this.circuit = circuit;
+    }
+
+    this(Circuit circuit, Value condition)
+    {
+        this.circuit = circuit;
         this.condition = condition;
     }
 
