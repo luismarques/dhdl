@@ -92,12 +92,23 @@ struct VPort(int width, bool signed)
 
     auto peek()
     {
-        return *port;
+        static if(width == 8 || width == 16 || width == 32 || width == 64)
+        {
+            return *port;
+        }
+        else
+        {
+            auto v = *port;
+            auto w = VP.sizeof * 8;
+            v <<= w - width;
+            v >>= w - width;
+            return v;
+        }
     }
 
     string toString()
     {
-        return (*port).to!string;
+        return peek().to!string;
     }
 
     VP* port;
