@@ -277,6 +277,17 @@ string _emitSymbol(FIRRTLWriter writer, Expression exp, Value lastParent = null)
 }
 
 @method
+string _emitSymbol(FIRRTLWriter writer, Element e, Value lastParent = null)
+{
+    if(e.valueIndex !is null)
+    {
+        e.valueIndex.name = writer.emitSymbol(e.valueIndex, writer.circuit);
+    }
+
+    return e.toFIRSymbol;
+}
+
+@method
 string _emitSymbol(FIRRTLWriter writer, MemElement e, Value lastParent = null)
 {
     if(!writer.dependencies.get(e, false))
@@ -497,7 +508,7 @@ string toFIRSymbol(Value value, Value lastParent = null)
     auto literal = value.literal;
 
     if(!literal.isNull)
-        return format("%s(%s)", value.toFIRTypeName, literal.to!string);
+        return format("%s(%s)", value.toFIRTypeName, literal);
 
     return toFIRFullName(value.parent, value, lastParent);
 }

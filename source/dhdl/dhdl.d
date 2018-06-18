@@ -930,12 +930,12 @@ class Element : Value
         if(valueIndex !is null)
             return format("[%s]", valueIndex.name);
         else
-            return format("[%s]", constIndex.to!string);
+            return format("[%s]", constIndex);
     }
 
     void name(string _name)
     {
-        this._name = _name;
+        assert(false);
     }
 
     Value parent()
@@ -999,10 +999,9 @@ class Element : Value
     }
 
 private:
-    string _name;
     Value _parent;
     public Value valueIndex; // TODO: visibility
-    int constIndex;
+    public int constIndex; // Ditto
 }
 
 class Mem : Vectorial
@@ -1140,6 +1139,8 @@ class MemElement : Element
     {
         this._name = _name;
     }
+
+    string _name;
 }
 
 class Reg : Value
@@ -1148,7 +1149,6 @@ class Reg : Value
     {
         this.value = value;
         this.clock = clock;
-        //value.parent = this;
     }
 
     string name()
