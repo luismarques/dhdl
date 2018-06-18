@@ -1340,25 +1340,16 @@ class Circuit : Composite
     void match(Args...)(Value value, Args args)
     {
         static assert(args.length % 2 == 0);
-        auto when = new When(this);
-        matchImpl(when, value, args);
-    }
+        
+        auto when = new When(this, value.eq(args[0]));
 
-    private void matchImpl(Args...)(When when, Value value, Args args)
-    {
-        when.condition = value.eq(args[0]);
         blockStack ~= &when.blockTrue;
         args[1]();
         blockStack.popBack();
         currentBlock ~= when;
-    
+
         static if(args.length > 2)
-        {
-            blockStack ~= &when.blockFalse;
-            auto elseWhen = new When(this);
-            matchImpl(elseWhen, value, args[2 .. $]);
-            blockStack.popBack();
-        }
+            match(value, args[2 .. $]);
     }
 
     auto ref currentBlock()

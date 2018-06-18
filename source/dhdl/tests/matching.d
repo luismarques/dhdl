@@ -55,6 +55,5 @@ version(HWTests) unittest
 
 	c.a = 3;
     c.eval();
-	writeln(c.b);
 	assert(c.b == -3);
 }
