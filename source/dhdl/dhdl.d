@@ -788,12 +788,16 @@ template Vec(Args...)
             {
                 value.parent = this;
                 values = [value];
+                _width = value.width;
             }
 
             this(Value[] values)
             {
                 foreach(value; values)
+                {
                     value.parent = this;
+                    _width = max(_width, value.width);
+                }
 
                 this.values = values;
                 _depth = values.length.to!int;
@@ -804,6 +808,7 @@ template Vec(Args...)
                 value.parent = this;
                 this.depth = depth;
                 values = [value];
+                _width = value.width;
             }
 
             string name()
@@ -828,12 +833,12 @@ template Vec(Args...)
 
             int width()
             {
-                return unknownWidth;
+                return _width;
             }
 
             void width(int _width)
             {
-                assert(false, "Cannot set width of a Vec");
+                this._width = _width;
             }
 
             int depth()
@@ -906,6 +911,7 @@ template Vec(Args...)
             Value[] values;
             Direction dir;
             int _depth;
+            int _width;
         }
     }
     else
