@@ -208,7 +208,7 @@ bool isComposite(Value value)
 interface Composite : Value
 {
     Value[string] ports();
-    void declare(Value);
+    void declare(Value, Direction);
 }
 
 template Bits(int n)
@@ -678,9 +678,9 @@ class Bundle : Composite
         assert(false);
     }
 
-    void declare(Value value)
+    void declare(Value value, Direction dir)
     {
-        if(value.direction != Direction.nil)
+        if(dir != Direction.nil)
             _ports[value.name] = value;
     }
 
@@ -1376,9 +1376,9 @@ class Circuit : Composite
         return _ports;
     }
 
-    void declare(Value value)
+    void declare(Value value, Direction dir)
     {
-        if(value.direction != Direction.nil)
+        if(dir != Direction.nil)
             _ports[value.name] = value;
         else
             currentBlock ~= new ValueDeclaration(value);
@@ -1478,13 +1478,18 @@ void instantiate(alias value, Parent, Args...)(Parent parent, Args args)
     value.name = name;
 
     static if(hasUDA!(value, in_))
-        value.direction = in_;
+        enum dir = in_;
     else static if(hasUDA!(value, out_))
-        value.direction = out_;
+        enum dir = out_;
     else static if(hasUDA!(value, inout_))
-        value.direction = inout_;
+        enum dir = inout_;
+    else
+        enum dir = Direction.nil;
 
-    parent.declare(value);
+    static if(dir != Direction.nil)
+        value.direction = dir;
+
+    parent.declare(value, dir);
 }
 
 void connect(DstPort, SrcPort)(Circuit circuit, DstPort dst, SrcPort src)
