@@ -569,7 +569,7 @@ class Wire : Value
 
     Value slice(int a, int b)
     {
-        return value.slice(a, b);
+        return .slice(this, a, b);
     }
 
     Value element(int i = 0)
@@ -1557,7 +1557,7 @@ class Expression : Value
 
     Value slice(int a, int b)
     {
-        return result.slice(a, b);
+        return .slice(this, a, b);
     }
 
     Value element(int i = 0)
