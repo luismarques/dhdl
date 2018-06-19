@@ -508,7 +508,15 @@ string toFIRSymbol(Value value, Value lastParent = null)
     auto literal = value.literal;
 
     if(!literal.isNull)
-        return format("%s(%s)", value.toFIRTypeName, literal);
+    {
+        enum fmt = "%s(%s)";
+        auto typeName = value.toFIRTypeName;
+
+        if(value.isSigned)
+            return format(fmt, typeName, cast(long) literal);
+        else
+            return format(fmt, typeName, literal);
+    }
 
     return toFIRFullName(value.parent, value, lastParent);
 }
@@ -520,10 +528,16 @@ unittest
     assert(bits.toFIRSymbol == "bits");
 
     auto bits42 = new Bits!0(42);
-    assert(bits42.toFIRSymbol == "UInt(42)");
+    assert(bits42.toFIRSymbol == "UInt<6>(42)");
 
     bits42.width = 8;
     assert(bits42.toFIRSymbol == "UInt<8>(42)");
+
+    auto sint42 = new SInt!0(42);
+    assert(sint42.toFIRSymbol == "SInt<7>(42)");
+
+    auto sintm42 = new SInt!0(-42);
+    assert(sintm42.toFIRSymbol == "SInt<7>(-42)");
 
     auto btrue = new Bool(true);
     assert(btrue.toFIRSymbol == "UInt<1>(1)");

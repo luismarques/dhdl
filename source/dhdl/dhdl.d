@@ -78,6 +78,7 @@ interface Value
     void direction(Direction);
     ValueType type();
     Nullable!ulong literal();
+    bool isSigned();
     Value slice(int, int);
     Value index(int);
     Value index(Value);
@@ -221,6 +222,7 @@ template Bits(int n)
             this(ulong _literal)
             {
                 this._literal = _literal;
+                _width = _literal.widthOf;
             }
 
             string name()
@@ -271,6 +273,11 @@ template Bits(int n)
             Nullable!ulong literal()
             {
                 return _literal;
+            }
+
+            bool isSigned()
+            {
+                return false;
             }
 
             Value slice(int high, int low)
@@ -371,9 +378,15 @@ template UInt(int n)
         {
             this() {}
 
+            this(long _literal)
+            {
+                assert(false);
+            }
+
             this(ulong _literal)
             {
                 this._literal = _literal;
+                _width = _literal.widthOf;
             }
 
             this(Width width)
@@ -442,9 +455,16 @@ template SInt(int n)
         {
             this() {}
 
-            this(ulong _literal)
+            this(long _literal)
             {
                 this._literal = _literal;
+                
+                if(_literal >= 0)
+                    _width = _literal.widthOf + 1;
+                else if(_literal == long.min)
+                    _width = long.sizeof * 8;
+                else
+                    _width = (-_literal).widthOf + 1;
             }
 
             this(Width width)
@@ -461,6 +481,11 @@ template SInt(int n)
             override ValueType type()
             {
                 return ValueType.signedInt;
+            }
+
+            override bool isSigned()
+            {
+                return true;
             }
         }
     }
@@ -557,6 +582,11 @@ class Wire : Value
         return Nullable!ulong.init;
     }
 
+    bool isSigned()
+    {
+        return value.isSigned;
+    }
+
     Value index(int i)
     {
         return value.index(i);
@@ -641,6 +671,11 @@ class Bundle : Composite
     Nullable!ulong literal()
     {
         return Nullable!ulong.init;
+    }
+
+    bool isSigned()
+    {
+        assert(false);
     }
 
     void declare(Value value)
@@ -831,6 +866,11 @@ template Vec(Args...)
                 return Nullable!ulong.init;
             }
 
+            bool isSigned()
+            {
+                assert(false);
+            }
+
             Element index(int i)
             {
                 auto e = new Element(i);
@@ -973,6 +1013,11 @@ class Element : Value
         return Nullable!ulong.init;
     }
 
+    bool isSigned()
+    {
+        assert(false);
+    }
+
     Value index(int i)
     {
         return parent.index(i);
@@ -1072,6 +1117,11 @@ class Mem : Vectorial
     Nullable!ulong literal()
     {
         return Nullable!ulong.init;
+    }
+
+    bool isSigned()
+    {
+        assert(false);
     }
 
     Element index(int i)
@@ -1196,6 +1246,11 @@ class Reg : Value
         return Nullable!ulong.init;
     }
 
+    bool isSigned()
+    {
+        assert(false);
+    }
+
     Value index(int i)
     {
         auto e = new Element(i);
@@ -1303,6 +1358,11 @@ class Circuit : Composite
     Nullable!ulong literal()
     {
         return Nullable!ulong.init;
+    }
+
+    bool isSigned()
+    {
+        assert(false);
     }
 
     Value[string] ports()
@@ -1543,6 +1603,11 @@ class Expression : Value
     Nullable!ulong literal()
     {
         return Nullable!ulong.init;
+    }
+
+    bool isSigned()
+    {
+        assert(false);
     }
 
     Value index(int i)

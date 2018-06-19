@@ -114,6 +114,9 @@ class VectorROM : Circuit
             45.U,
         ]);
 
+        Reg reg;
+        this.instantiate!reg(rom[0]);
+
         this.connect(readVal, rom[readAddr]);
     }
 }
