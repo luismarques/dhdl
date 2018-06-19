@@ -1787,7 +1787,9 @@ auto slice(Value a, int high, int low)
 {
     assert(low >= 0);
     assert(high > low); // open interval
-    return new Expression("bits", [a], [high-1, low]);
+    auto exp = new Expression("bits", [a], [high-1, low]);
+    exp.width = high-low;
+    return exp;
 }
 
 /// Number of bits necessary to hold `x`.

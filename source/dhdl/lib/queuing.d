@@ -53,15 +53,28 @@ class Queue(T, int entries) : Circuit
         when(doEnq,
         {
             this.connect(ram[enqPtr], enq.payload);
-            this.connect(enqPtr, enqPtr + 1.U);
+
+            when(enqPtr.eq((entries-1).U),
+            {
+                this.connect(enqPtr, 0.U);
+            },
+            {
+                this.connect(enqPtr, enqPtr + 1.U);
+            });
         });
 
         when(doDeq,
         {
-            this.connect(deqPtr, deqPtr + 1.U);
+            when(deqPtr.eq((entries-1).U),
+            {
+                this.connect(deqPtr, 0.U);
+            },
+            {
+                this.connect(deqPtr, deqPtr + 1.U);
+            });
         });
 
-        when(doDeq.neq(doDeq),
+        when(doEnq.neq(doDeq),
         {
             this.connect(maybeFull, doEnq);
         });
@@ -97,8 +110,7 @@ class Queue(T, int entries) : Circuit
             });
         }
 
-        auto diff = enqPtr - deqPtr;
-        this.connect(count, diff);
+        this.connect(count, (maybeFull & ptrMatch) ~ (enqPtr - deqPtr)[entries.widthOf-1 .. 0]);
     }
 }
 
@@ -112,6 +124,24 @@ version(HWTests) unittest
     assert(queue.deq.valid == false);
 
     queue.enq.valid = true;
+
+    foreach(i; 0 .. 8)
+        queue.step();
+
+    assert(queue.count == 8);
+    assert(queue.enq.ready == false);
+
+    queue.enq.valid = false;
+    queue.deq.ready = true;
+
+    while(queue.count > 0)
+        queue.step();
+
+    assert(queue.enq.ready == true);
+    assert(queue.deq.valid == false);
+
+    queue.enq.valid = true;
+    queue.deq.ready = false;
 
     queue.enq.payload = 42;
     queue.step();
