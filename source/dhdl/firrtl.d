@@ -183,7 +183,12 @@ void _emit(FIRRTLWriter writer, Circuit circuit)
 {
     writer.addDependency(circuit);
     writer.wfln("inst %s of %s", circuit.name, circuit.prototypeName);
+
     writer.wfln("%s is invalid", circuit.name);
+
+    // TODO: allow customizing the clock and reset ports
+    writer.wfln("%s.clock <= clock", circuit.name);
+    writer.wfln("%s.reset <= reset", circuit.name);
 }
 
 @method
