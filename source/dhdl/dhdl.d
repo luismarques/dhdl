@@ -1499,8 +1499,8 @@ void connect(DstPort, SrcPort)(Circuit circuit, DstPort dst, SrcPort src)
     static if(hasMember!(DstPort, "staticWidth") && hasMember!(SrcPort, "staticWidth"))
         static assert(src.staticWidth <= dst.staticWidth, "mismatched port widths");
 
-    assert(dst !is null);
-    assert(src !is null);
+    assert(dst !is null, "Destination port is null");
+    assert(src !is null, "Source port is null");
 
     if(src.direction != Direction.nil)
     {
