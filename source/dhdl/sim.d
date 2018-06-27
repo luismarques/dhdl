@@ -19,7 +19,7 @@ int writeSimulator(Circuit circuit, bool verbose)
     writeSimulatorMain(circuit);
 
     auto name = circuit.prototypeName;
-    auto cmd = format("make -f V%s.mk LDFLAGS=-shared", name);
+    auto cmd = format("make -f V%s.mk", name);
 
     if(verbose)
         writeln(cmd);
@@ -66,7 +66,9 @@ int writeCpp(Circuit circuit, bool verbose)
         return r;
     }
 
-    auto cmd = format("verilator --cc --exe lib.cpp %s.v", name);
+    auto cmd = format(
+        "verilator -CFLAGS -fPIC -LDFLAGS -shared --cc --exe lib.cpp %s.v",
+        name);
 
     if(verbose)
         writeln(cmd);
