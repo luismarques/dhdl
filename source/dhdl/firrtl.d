@@ -214,15 +214,6 @@ void _emit(FIRRTLWriter writer, Reg reg)
             regClockName,
             writer.emitSymbol(reg.value, writer.circuit));
     }
-
-    // TODO: ideally do this at the DHDL level (needs refactoring)
-    // At least don't duplicate the code from emit(Connection)?
-    if(!v.isType && v.literal.isNull)
-    {
-        writer.wfln("%s <= %s",
-            writer.emitSymbol(reg, writer.circuit),
-            writer.emitSymbol(v, writer.circuit));
-    }
 }
 
 @method
