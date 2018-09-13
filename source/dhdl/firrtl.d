@@ -292,7 +292,7 @@ string _emitSymbol(FIRRTLWriter writer, Element e, Value lastParent = null)
         e.valueIndex.name = writer.emitSymbol(e.valueIndex, writer.circuit);
     }
 
-    return e.toFIRSymbol;
+    return e.toFIRSymbol(lastParent);
 }
 
 @method
