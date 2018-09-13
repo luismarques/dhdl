@@ -97,6 +97,10 @@ interface Value
             return add(this, rhs);
         else static if(op == "-")
             return sub(this, rhs);
+        else static if(op == "*")
+            return mul(this, rhs);
+        else static if(op == "/")
+            return div(this, rhs);
         else static if(op == "~")
             return cat(this, rhs);
         else
@@ -1307,6 +1311,11 @@ class Circuit : Composite
         if(this.classinfo.deallocator is null)
             this.classinfo.deallocator = Circuit.classinfo.deallocator;
 
+        auto name = this.baseName;
+        auto id = instanceCounter.get(name, -1);
+        instanceCounter[name] = ++id;
+        instanceId = id;
+
         if(clocked)
         {
             this.instantiate!clock;
@@ -1329,6 +1338,16 @@ class Circuit : Composite
     string prototypeName()
     {
         return this.baseName;
+    }
+
+    string instanceName()
+    {
+        auto name = this.baseName;
+
+        if(instanceId == 0)
+            return name;
+        else
+            return format("%s_%s", name, instanceId);
     }
 
     string name()
@@ -1460,6 +1479,8 @@ private:
     // instance properties
     string _name;
     Direction dir;
+    static int[string] instanceCounter;
+    int instanceId;
 
 public: // TODO: visibility
     Node[] bodyBlock;
@@ -1734,6 +1755,22 @@ auto sub(Value a, Value b)
     return exp;
 }
 
+/// a * b
+auto mul(Value a, Value b)
+{
+    auto exp = new Expression("mul", [a, b]);
+    exp.width = a.width + b.width;
+    return exp;
+}
+
+/// a / b
+auto div(Value a, Value b)
+{
+    auto exp = new Expression("div", [a, b]);
+    exp.width = a.width; // TODO
+    return exp;
+}
+
 /// a == b
 auto eq(Value a, Value b)
 {
@@ -1792,6 +1829,7 @@ auto slice(Value a, int high, int low)
     return exp;
 }
 
+// TODO: rename to bitWidth
 /// Number of bits necessary to hold `x`.
 /// A zero value is assumed to be 1-bit wide.
 int widthOf(ulong x)

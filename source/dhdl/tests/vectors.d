@@ -12,8 +12,8 @@ import dhdl.testing;
 
 class VectorPorts : Circuit
 {
-    @in_ Vec!(Bool, 3) a;
-    @out_ Vec!(Bool, 3) b;
+    @in_ Vec!(Bool, 2) a;
+    @out_ Vec!(Bool, 2) b;
 
     this()
     {
@@ -131,4 +131,51 @@ version(HWTests) unittest
         c.eval();
         assert(c.readVal == 42 + i);
     }    
+}
+
+class TestBundle : Bundle
+{
+    @in_ Bool x;
+    @in_ Bool y;
+
+    this()
+    {
+        this.instantiate!x;
+        this.instantiate!y;
+    }
+}
+
+class VectorBundlePorts : Circuit
+{
+    @in_ Vec!(TestBundle, 2)  a;
+    @out_ Vec!(TestBundle, 2) b;
+
+    this()
+    {
+        this.instantiate!a;
+        this.instantiate!b;
+
+        //this.connect((cast(TestBundle) b[1].element).x, (cast(TestBundle) a[0].element).x);
+        //this.connect((cast(TestBundle) b[0].element).x, (cast(TestBundle) a[1].element).x);
+
+        //this.connect((cast(TestBundle) b[1].element).x, (cast(TestBundle) a[0].element).x);
+        auto e0 = (cast(TestBundle) b[0].element);
+        e0.parent = b[0];
+        auto e1 = (cast(TestBundle) a[1].element);
+        e1.parent = a[1];
+        this.connect(e0.x, e1.x);
+    }
+}
+
+version(HWTests) unittest
+{
+    auto c = peekPokeTester!VectorBundlePorts;
+    /+
+    c.a[0].x = true;
+    c.a[0].y = false;
+    c.a[1].x = false;
+    c.a[0].y = false;
+    c.eval();
+    assert(c.b[0].x == true);
+    assert(c.b[1].x == false);+/
 }

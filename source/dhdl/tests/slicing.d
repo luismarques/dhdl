@@ -36,3 +36,5 @@ version(HWTests) unittest
 	assert(c.hi == 0xA);
 	assert(c.lo == 0xB);
 }
+
+// TODO: slice single bit (with indexing?)

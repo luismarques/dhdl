@@ -28,7 +28,7 @@ class FIRRTLWriter
     {
         f.init();
 
-        wfln("circuit %s :", circuit.baseName);
+        wfln("circuit %s :", circuit.instanceName);
         enter();
 
         addDependency(circuit);
@@ -82,7 +82,7 @@ class FIRRTLWriter
     {
         this.circuit = circuit;
 
-        wfln("module %s :", circuit.baseName);
+        wfln("module %s :", circuit.instanceName);
         enter();
 
         foreach(name, p; circuit.ports)
@@ -182,7 +182,7 @@ void _emit(FIRRTLWriter writer, ValueDeclaration valDecl)
 void _emit(FIRRTLWriter writer, Circuit circuit)
 {
     writer.addDependency(circuit);
-    writer.wfln("inst %s of %s", circuit.name, circuit.prototypeName);
+    writer.wfln("inst %s of %s", circuit.name, circuit.instanceName);
 
     writer.wfln("%s is invalid", circuit.name);
 

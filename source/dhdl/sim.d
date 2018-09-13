@@ -88,7 +88,7 @@ int writeVerilog(Circuit circuit, bool verbose = false)
     auto name = circuit.prototypeName;
 
     auto e = executeShell(
-        format("firrtl -i %1$s.fir -o %1$s.v", name),  
+        format("firrtl -i %1$s.fir -o %1$s.v", name),
         null, Config.none, size_t.max, "rtl/" ~ name);
 
     if(verbose && e.status != 0)
