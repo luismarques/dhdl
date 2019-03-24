@@ -45,10 +45,12 @@ final class PeekPokeTester(SomeCircuit) : Tester
         if(synchronous)
         {
             port!"reset" = 1;
+            eval();
             clock = 1;
             eval();
 
             port!"reset" = 0;
+            eval();
             clock = 0;
             eval();
         }
@@ -57,6 +59,7 @@ final class PeekPokeTester(SomeCircuit) : Tester
             port!"reset" = 1;
             eval();
             port!"reset" = 0;
+            eval();
         }
     }
 
